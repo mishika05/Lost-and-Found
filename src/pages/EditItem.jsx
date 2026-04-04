@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { fetchItem, updateItem } from "../utils/api"
 
 function EditItem() {
 
@@ -9,20 +10,26 @@ function EditItem() {
   const [item, setItem] = useState(null)
 
   useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("items")) || []
-    setItem(items[id])
+    fetchItem(id)
+      .then(setItem)
+      .catch(console.error)
   }, [id])
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
 
-    let items = JSON.parse(localStorage.getItem("items")) || []
+    const formData = new FormData()
+    formData.append("name", item.name)
+    formData.append("category", item.category)
+    formData.append("location", item.location)
+    formData.append("desc", item.desc)
 
-    items[id] = item
-
-    localStorage.setItem("items", JSON.stringify(items))
-
-    alert("Item updated successfully!")
-    navigate("/my-items")
+    try {
+      await updateItem(id, formData)
+      alert("Item updated successfully!")
+      navigate("/my-items")
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
   if (!item) return <div>Loading...</div>

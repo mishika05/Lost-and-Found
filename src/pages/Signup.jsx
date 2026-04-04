@@ -1,39 +1,35 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { signupUser } from "../utils/api"
 
 function Signup() {
 
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
 
-  const handleSignup = () => {
-    let users = JSON.parse(localStorage.getItem("users")) || []
-
-    const exists = users.find(u => u.email === email)
-
-    if (exists) {
-      alert("User already exists")
-      return
+  const handleSignup = async () => {
+    try {
+      await signupUser(name, email, password)
+      navigate("/items")
+    } catch (err) {
+      alert(err.message)
     }
-
-    users.push({ email, password })
-    localStorage.setItem("users", JSON.stringify(users))
-
-    alert("Account created!")
-    navigate("/")
   }
 
   return (
     <div className="signup-container">
-
       <div className="signup-card">
 
         <div className="signup-icon">👤</div>
 
         <h2>Create Account</h2>
 
-        <input placeholder="Full Name" />
+        <input
+          placeholder="Full Name"
+          onChange={(e) => setName(e.target.value)}
+        />
 
         <input
           type="email"

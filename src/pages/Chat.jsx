@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { fetchMessages, sendMessage as sendMsg } from "../utils/api"
 
 function Chat() {
 
@@ -8,24 +9,21 @@ function Chat() {
   const [text, setText] = useState("")
 
   useEffect(() => {
-    const chats = JSON.parse(localStorage.getItem("chats")) || {}
-    setMessages(chats[id] || [])
+    fetchMessages(id)
+      .then(setMessages)
+      .catch(console.error)
   }, [id])
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!text) return
 
-    const chats = JSON.parse(localStorage.getItem("chats")) || {}
-
-    const newMsg = { text, sender: "You" }
-
-    const updated = [...(chats[id] || []), newMsg]
-
-    chats[id] = updated
-    localStorage.setItem("chats", JSON.stringify(chats))
-
-    setMessages(updated)
-    setText("")
+    try {
+      await sendMsg(id, text)
+      setText("")
+      fetchMessages(id).then(setMessages)
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
   return (
@@ -35,7 +33,7 @@ function Chat() {
 
       <div style={{ marginBottom: "20px" }}>
         {messages.map((m, i) => (
-          <p key={i}><b>{m.sender}:</b> {m.text}</p>
+          <p key={i}><b>{m.senderEmail}:</b> {m.text}</p>
         ))}
       </div>
 

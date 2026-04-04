@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { loginUser } from "../utils/api"
 
 function Login() {
 
@@ -7,18 +8,12 @@ function Login() {
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
 
-  const handleLogin = () => {
-    const users = JSON.parse(localStorage.getItem("users")) || []
-
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    )
-
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user))
+  const handleLogin = async () => {
+    try {
+      await loginUser(email, password)
       navigate("/items")
-    } else {
-      alert("Invalid credentials")
+    } catch (err) {
+      alert(err.message)
     }
   }
 
@@ -30,9 +25,7 @@ function Login() {
         <div className="left-panel">
           <div className="circle1"></div>
           <div className="circle2"></div>
-
           <h2>WELCOME!</h2>
-
           <p>
             This Lost & Found portal for Bennett University helps students
             quickly report lost items and connect with people who have found them.
@@ -41,7 +34,6 @@ function Login() {
 
         {/* RIGHT */}
         <div className="right-panel">
-
           <div className="title">Lost & Found</div>
 
           <div className="menu">
@@ -70,7 +62,6 @@ function Login() {
           <button className="signin-btn" onClick={handleLogin}>
             Log in
           </button>
-
         </div>
       </div>
     </div>

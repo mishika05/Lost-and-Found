@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { uploadItem } from "../utils/api"
 
 function UploadItem() {
 
@@ -8,39 +9,32 @@ function UploadItem() {
   const [date, setDate] = useState("")
   const [location, setLocation] = useState("")
   const [desc, setDesc] = useState("")
-  const [image, setImage] = useState("")
+  const [imageFile, setImageFile] = useState(null)
 
   const navigate = useNavigate()
 
-  const currentUser = JSON.parse(localStorage.getItem("user"))
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
 
     if (!name || !category) {
       alert("Please fill required fields")
       return
     }
 
-    let items = JSON.parse(localStorage.getItem("items")) || []
+    const formData = new FormData()
+    formData.append("name", name)
+    formData.append("category", category)
+    formData.append("date", date)
+    formData.append("location", location)
+    formData.append("desc", desc)
+    if (imageFile) formData.append("image", imageFile)
 
-    const newItem = {
-      name,
-      category,
-      date,
-      location,
-      desc,
-      image,
-      user: currentUser?.email, // ✅ IMPORTANT (for ownership)
-      status: "active"
+    try {
+      await uploadItem(formData)
+      alert("Item uploaded successfully!")
+      navigate("/items")
+    } catch (err) {
+      alert(err.message)
     }
-
-    items.push(newItem)
-
-    localStorage.setItem("items", JSON.stringify(items))
-
-    alert("Item uploaded successfully!")
-
-    navigate("/items")
   }
 
   return (
@@ -112,24 +106,18 @@ function UploadItem() {
         ></textarea>
 
         {/* IMAGE */}
-<label>Upload Image (Optional)</label>
+        <label>Upload Image (Optional)</label>
 
-<input
-  type="file"
-  accept="image/*"
-  className="upload-input"
-  onChange={(e) => {
-    const file = e.target.files[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setImage(reader.result) // store base64
-    }
-
-    reader.readAsDataURL(file)
-  }}
-/>
+        <input
+          type="file"
+          accept="image/*"
+          className="upload-input"
+          onChange={(e) => {
+            const file = e.target.files[0]
+            if (!file) return
+            setImageFile(file)
+          }}
+        />
 
         {/* BUTTONS */}
         <div className="btn-row">

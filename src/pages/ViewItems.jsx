@@ -51,7 +51,7 @@ function ViewItems() {
 
       {/* NAVBAR */}
       <div className="navbar">
-        <h2 className="logo">Lost & Found</h2>
+        <h2 className="logo">ReturnIt</h2>
         <div className="nav-links">
           <span onClick={() => navigate("/items")}>Dashboard</span>
           <span onClick={() => navigate("/upload")}>Upload Item</span>

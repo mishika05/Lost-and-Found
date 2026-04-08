@@ -1,7 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { fetchItem, fetchMessages, fetchConversations, sendMessage as sendMsg, deleteItem as removeItem, resolveItem, getUser } from "../utils/api"
+import { fetchItem, fetchMessages, fetchConversations, sendMessage as sendMsg, deleteItem as removeItem, resolveItem, getUser, deleteMessage } from "../utils/api"
 
+
+const getImageUrl = (image) => {
+  if (!image) return "https://cdn-icons-png.flaticon.com/512/679/679720.png"
+  if (image.startsWith("http")) return image
+  return `http://localhost:5000${image}`
+}
 function ItemDetails() {
 
   const { id } = useParams()
@@ -109,7 +115,7 @@ function ItemDetails() {
             )}
           </div>
 
-          <img src={item.image || "https://cdn-icons-png.flaticon.com/512/679/679720.png"} />
+          <img src={getImageUrl(item.image)} alt="item" />
 
           <h2>{item.name}</h2>
 
@@ -204,12 +210,38 @@ function ItemDetails() {
                               className="chat-bubble"
                               style={{
                                 background: msg.sender === currentUser.id ? "#dbeafe" : "#f1f5f9",
-                                textAlign: msg.sender === currentUser.id ? "right" : "left"
+                                textAlign: msg.sender === currentUser.id ? "right" : "left",
+                                position: "relative"
                               }}
                             >
                               <b>{msg.senderName || msg.senderEmail}</b>
                               <p>{msg.text}</p>
                               <small>{new Date(msg.createdAt).toLocaleString()}</small>
+                            
+                              {/* ✅ DELETE BUTTON */}
+                              {msg.sender === currentUser.id && (
+                                <span
+                                  onClick={async () => {
+                                    if (!window.confirm("Delete this message?")) return
+                                    try {
+                                      await deleteMessage(msg._id)
+                                      loadData()
+                                    } catch (err) {
+                                      alert(err.message)
+                                    }
+                                  }}
+                                  style={{
+                                    position: "absolute",
+                                    top: "4px",
+                                    left: "6px",
+                                    cursor: "pointer",
+                                    fontSize: "12px",
+                                    color: "#ef4444"
+                                  }}
+                                >
+                                  Delete
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -220,6 +252,7 @@ function ItemDetails() {
                             placeholder={`Reply to ${conversations.find(c => c.senderId === selectedSender)?.senderName || "user"}...`}
                             value={text}
                             onChange={(e) => setText(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                           />
                           <button onClick={sendMessage}>Reply</button>
                         </div>
@@ -245,12 +278,38 @@ function ItemDetails() {
                       className="chat-bubble"
                       style={{
                         background: msg.senderEmail === currentUser.email ? "#dbeafe" : "#f1f5f9",
-                        textAlign: msg.senderEmail === currentUser.email ? "right" : "left"
+                        textAlign: msg.senderEmail === currentUser.email ? "right" : "left",
+                        position: "relative"
                       }}
                     >
                       <b>{msg.senderName || msg.senderEmail}</b>
                       <p>{msg.text}</p>
                       <small>{new Date(msg.createdAt).toLocaleString()}</small>
+                    
+                      {/* ✅ DELETE BUTTON — only show on your own messages */}
+                      {msg.senderEmail === currentUser.email && (
+                        <span
+                          onClick={async () => {
+                            if (!window.confirm("Delete this message?")) return
+                            try {
+                              await deleteMessage(msg._id)
+                              loadData()
+                            } catch (err) {
+                              alert(err.message)
+                            }
+                          }}
+                          style={{
+                            position: "absolute",
+                            top: "4px",
+                            left: "6px",
+                            cursor: "pointer",
+                            fontSize: "11px",
+                            color: "#ef4444"
+                          }}
+                        >
+                          Delete
+                        </span>
+                      )}
                     </div>
                   ))
                 )}
@@ -261,6 +320,7 @@ function ItemDetails() {
                   placeholder="Type your message..."
                   value={text}
                   onChange={(e) => setText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
                 <button onClick={sendMessage}>Send</button>
               </div>

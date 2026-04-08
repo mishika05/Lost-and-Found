@@ -153,5 +153,20 @@ router.post("/:itemId", protect, async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 })
+// DELETE /api/messages/:messageId — delete your own message
+router.delete("/:messageId", protect, async (req, res) => {
+  try {
+    const message = await Message.findById(req.params.messageId)
+    if (!message) return res.status(404).json({ message: "Message not found" })
+
+    if (message.sender.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not authorized" })
+
+    await message.deleteOne()
+    res.json({ message: "Message deleted" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
 
 module.exports = router

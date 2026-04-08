@@ -33,7 +33,7 @@ router.post("/signup", async (req, res) => {
     if (!name || !email || !password)
       return res.status(400).json({ message: "All fields are required" })
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@bennett\.edu\.in$/
     if (!emailRegex.test(email))
       return res.status(400).json({ message: "Enter a valid email address" })
 
@@ -87,11 +87,22 @@ router.put("/profile", protect, upload.single("profilePicture"), async (req, res
     const user = await User.findById(req.user.id)
     if (!user) return res.status(404).json({ message: "User not found" })
 
+    // ✅ ADD THIS
+    if (email) {
+      const emailRegex = /^[^\s@]+@bennett\.edu\.in$/
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Only Bennett University email (@bennett.edu.in) is allowed" })
+      }
+    }
+
     if (name) user.name = name
     if (email) user.email = email
     if (password) user.password = await bcrypt.hash(password, 10)
     if (req.file) {
       user.profilePicture = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+    }
+    if (req.body.removePhoto === "true") {
+      user.profilePicture = ""
     }
 
     await user.save()

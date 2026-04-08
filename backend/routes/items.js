@@ -70,7 +70,7 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
       return res.status(400).json({ message: "Name and category are required" })
 
     const imageUrl = req.file
-      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      ? `/uploads/${req.file.filename}`
       : ""
 
     const item = await Item.create({
@@ -109,7 +109,7 @@ router.put("/:id", protect, upload.single("image"), async (req, res) => {
     item.desc = desc || item.desc
 
     if (req.file) {
-      item.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      item.image = `/uploads/${req.file.filename}`
     }
 
     await item.save()

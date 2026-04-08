@@ -14,9 +14,10 @@ function Profile() {
   const [showPass, setShowPass] = useState(false)
   const [profilePicFile, setProfilePicFile] = useState(null)
   const [preview, setPreview] = useState(currentUser?.profilePicture || "")
+  const [removePhoto, setRemovePhoto] = useState(false)
 
   const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    return /@bennett\.edu\.in$/.test(email)
   }
 
   const handleImageChange = (e) => {
@@ -34,7 +35,7 @@ function Profile() {
     }
 
     if (!isValidEmail(email)) {
-      alert("Enter a valid email")
+      alert("Only Bennett University email (@bennett.edu.in) is allowed")
       return
     }
 
@@ -53,6 +54,7 @@ function Profile() {
     formData.append("email", email)
     if (password) formData.append("password", password)
     if (profilePicFile) formData.append("profilePicture", profilePicFile)
+    if (removePhoto) formData.append("removePhoto", "true")
 
     try {
       await updateProfile(formData)
@@ -116,9 +118,34 @@ function Profile() {
               onChange={handleImageChange}
             />
           </div>
+
           <p style={{ marginTop: "8px", color: "#666", fontSize: "13px" }}>
             {currentUser?.email}
           </p>
+
+          {/* REMOVE PHOTO BUTTON */}
+          {preview && (
+            <button
+              onClick={() => {
+                setPreview("")
+                setProfilePicFile(null)
+                setRemovePhoto(true)
+              }}
+              style={{
+                marginTop: "8px",
+                background: "#fee2e2",
+                color: "#dc2626",
+                border: "none",
+                borderRadius: "8px",
+                padding: "4px 12px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "600"
+              }}
+            >
+              🗑️ Remove Photo
+            </button>
+          )}
         </div>
 
         {/* NAME */}

@@ -2,6 +2,11 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { fetchMyItems, logoutUser, getUser, resolveItem } from "../utils/api"
 
+const getImageUrl = (image) => {
+  if (!image) return "https://cdn-icons-png.flaticon.com/512/679/679720.png"
+  if (image.startsWith("http")) return image
+  return `http://localhost:5000${image}`
+}
 function MyItems() {
 
   const [items, setItems] = useState([])
@@ -124,12 +129,7 @@ function MyItems() {
                   )}
                 </div>
 
-                <img
-                  src={
-                    item.image ||
-                    "https://cdn-icons-png.flaticon.com/512/679/679720.png"
-                  }
-                  alt={item.name}
+                <img src={getImageUrl(item.image)} alt="item" 
                   style={{
                     opacity: item.status === "resolved" ? 0.6 : 1
                   }}

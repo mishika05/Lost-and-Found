@@ -2,6 +2,11 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { fetchItems, fetchUnreadCounts, logoutUser, getUser } from "../utils/api"
 
+const getImageUrl = (image) => {
+  if (!image) return "https://cdn-icons-png.flaticon.com/512/679/679720.png"
+  if (image.startsWith("http")) return image
+  return `http://localhost:5000${image}`
+}
 function ViewItems() {
 
   const [items, setItems] = useState([])
@@ -166,10 +171,7 @@ function ViewItems() {
 
                 <div className="item-category">{item.category}</div>
 
-                <img
-                  src={item.image || "https://cdn-icons-png.flaticon.com/512/679/679720.png"}
-                  alt="item"
-                />
+                <img src={getImageUrl(item.image)} alt="item" />
 
                 <h3>{item.name}</h3>
                 <p>{item.desc || "No description available"}</p>

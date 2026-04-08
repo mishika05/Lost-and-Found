@@ -80,7 +80,16 @@ export const fetchItems = async (search = "", category = "All", sort = "newest")
   if (!res.ok) throw new Error(data.message)
   return data
 }
-
+// Delete a message
+export const deleteMessage = async (messageId) => {
+  const res = await fetch(`${BASE_URL}/messages/${messageId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message)
+  return data
+}
 export const fetchUnreadCounts = async () => {
   const res = await fetch(`${BASE_URL}/messages/unread/count`, {
     headers: { Authorization: `Bearer ${getToken()}` },

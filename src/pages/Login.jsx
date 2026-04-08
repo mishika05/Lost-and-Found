@@ -9,12 +9,19 @@ function Login() {
   const navigate = useNavigate()
 
   const handleLogin = async () => {
-    try {
-      await loginUser(email, password)
-      navigate("/items")
-    } catch (err) {
-      alert(err.message)
-    }
+  if (!/@bennett\.edu\.in$/.test(email)) {
+    alert("Only Bennett University email (@bennett.edu.in) is allowed")
+    return
+  }
+  try {
+    await loginUser(email, password)
+    navigate("/items")
+  } catch (err) {
+    alert(err.message)
+  }
+}
+  const isValidEmail = (email) => {
+  return /@bennett\.edu\.in$/.test(email)
   }
 
   return (

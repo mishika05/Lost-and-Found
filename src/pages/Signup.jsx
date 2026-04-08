@@ -8,6 +8,11 @@ function Signup() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
+  const isValidEmail = (email) => {
+  return /@bennett\.edu\.in$/.test(email)
+  }
+  
+
 
   const handleSignup = async () => {
     try {
